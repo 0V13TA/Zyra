@@ -2,9 +2,10 @@
  * @typedef {Object} productObj
  * @property {string} name
  * @property {number} price
- * @property {"NGN" | "USD" | "GBP" | "EUR"} currency
  * @property {string} image
  * @property {number} quantity
+ * @property {"NGN" | "USD" | "GBP" | "EUR"} currency
+ * @property {"top" | "dress" | "shirt" | "trouser" | "skirt"} type
  */
 
 /**
@@ -97,8 +98,39 @@ function addToCart(product) {
  *
  * @example
  * ```
- * const Carts = getCart();
- * console.log(Carts[0].name);
+ * const cartProduct = getCart();
+ *    elements.counter.innerText = cartProduct.length;
+ *    elements.desktopCounter.innerText = `Cart: ${cartProduct.length}`;
+ *    let htmlText = "";
+ *    cartProduct.forEach((product) => {
+ *      htmlText += `
+ *      <div class="cart-item">
+ *        <img
+ *          src="${product.image}"
+ *          alt="${product.name}"
+ *        />
+ *        <div class="item-details">
+ *          <h4>${product.name}</h4>
+ *          <p class="item-price">${product.quantity} x ${(() => {
+ *            switch (product.currency) {
+ *              case "NGN":
+ *                return "₦";
+ *              case "USD":
+ *                return "$";
+ *              case "GBP":
+ *                return "£";
+ *              case "EUR":
+ *                return "€";
+ *              default:
+ *                return "₦";
+ *            }
+ *          })()}${product.price}</p>
+ *        </div>
+ *      </div>
+ *      `;
+ *    });
+ *    elements.cartList.innerHTML = htmlText;
+ *
  * ```
  */
 function getCart() {
@@ -107,8 +139,6 @@ function getCart() {
     if (localProducts === null) {
       return [];
     }
-
-    console.log(localProducts);
 
     /**
      * @type {productObj[]}

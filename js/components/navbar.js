@@ -2,9 +2,10 @@
  * @typedef {Object} productObj
  * @property {string} name
  * @property {number} price
- * @property {"NGN" | "USD" | "GBP" | "EUR"} currency
  * @property {string} image
  * @property {number} quantity
+ * @property {"NGN" | "USD" | "GBP" | "EUR"} currency
+ * @property {"top" | "dress" | "shirt" | "trouser" | "skirt"} type
  */
 
 class ZyraNavbar extends HTMLElement {
@@ -451,7 +452,7 @@ class ZyraNavbar extends HTMLElement {
 
       /* extra: active links simulation */
       #left-side ul li:first-child a {
-        color: #888;
+       color: #888;
       }
     </style>
   </head>
@@ -497,7 +498,7 @@ class ZyraNavbar extends HTMLElement {
       <!-- desktop / tablet left group (hidden on mobile) -->
       <div id="left-side">
         <ul>
-          <li><a href="#">Home</a></li>
+          <li><a href="./index.html?param=door">Home</a></li>
           <li class="selected"><a href="#">Categories</a></li>
           <li><a href="#">About</a></li>
           <li><a href="#">Contact Us</a></li>
@@ -580,7 +581,7 @@ class ZyraNavbar extends HTMLElement {
         <span>Shopping Cart</span>
         <button class="close-btn" id="close-cart">&times;</button>
       </div>
-      <div id="cart-items-list"></div>
+      <div id="cart-items-list" style="overflow:auto"></div>
       <div class="cart-actions">
         <button class="btn-dark">View Cart</button>
         <button class="btn-dark">Checkout</button>
@@ -643,15 +644,16 @@ class ZyraNavbar extends HTMLElement {
       overlay?.classList.toggle("open", force);
     };
 
-    /**
-     * @type {productObj[]}
-     */
-    const cartProduct = getCart();
-    elements.counter.innerText = cartProduct.length;
-    elements.desktopCounter.innerText = `Cart: ${cartProduct.length}`;
-    let htmlText = elements.cartList.innerHTML;
-    cartProduct.forEach((product) => {
-      htmlText += `
+    const updateCart = () => {
+      /**
+       * @type {productObj[]}
+       */
+      const cartProduct = getCart();
+      elements.counter.innerText = cartProduct.length;
+      elements.desktopCounter.innerText = `Cart: ${cartProduct.length}`;
+      let htmlText = "";
+      cartProduct.forEach((product) => {
+        htmlText += `
         <div class="cart-item">
           <img
             src="${product.image}"
@@ -675,9 +677,11 @@ class ZyraNavbar extends HTMLElement {
             })()}${product.price}</p>
           </div>
         </div>
-`;
-    });
-    elements.cartList.innerHTML = htmlText;
+        `;
+      });
+      elements.cartList.innerHTML = htmlText;
+    };
+    updateCart();
 
     // Listeners
     elements.hamburger?.addEventListener("click", () =>
@@ -694,12 +698,14 @@ class ZyraNavbar extends HTMLElement {
       toggle(elements.searchOverlay, null, false),
     );
 
-    elements.cartDesktopBtn?.addEventListener("click", () =>
-      toggle(elements.cartSidebar, elements.cartOverlay, true),
-    );
-    elements.cartMobileBtn?.addEventListener("click", () =>
-      toggle(elements.cartSidebar, elements.cartOverlay, true),
-    );
+    elements.cartDesktopBtn?.addEventListener("click", () => {
+      updateCart();
+      toggle(elements.cartSidebar, elements.cartOverlay, true);
+    });
+    elements.cartMobileBtn?.addEventListener("click", () => {
+      updateCart();
+      toggle(elements.cartSidebar, elements.cartOverlay, true);
+    });
     elements.cartOverlay?.addEventListener("click", () =>
       toggle(elements.cartSidebar, elements.cartOverlay, false),
     );
@@ -714,6 +720,10 @@ class ZyraNavbar extends HTMLElement {
         toggle(elements.searchOverlay, null, false);
         toggle(elements.cartSidebar, elements.cartOverlay, false);
       }
+    });
+
+    window.addEventListener("storage", () => {
+      updateCart();
     });
   }
 }
