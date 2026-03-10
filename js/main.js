@@ -2,7 +2,7 @@
  * @typedef {Object} productObj
  * @property {string} name
  * @property {number} price
- * @property {string} currency
+ * @property {"NGN" | "USD" | "GBP" | "EUR"} currency
  * @property {string} image
  * @property {number} quantity
  */
@@ -107,6 +107,8 @@ function getCart() {
     if (localProducts === null) {
       return [];
     }
+
+    console.log(localProducts);
 
     /**
      * @type {productObj[]}

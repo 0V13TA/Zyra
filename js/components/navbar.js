@@ -1,3 +1,12 @@
+/**
+ * @typedef {Object} productObj
+ * @property {string} name
+ * @property {number} price
+ * @property {"NGN" | "USD" | "GBP" | "EUR"} currency
+ * @property {string} image
+ * @property {number} quantity
+ */
+
 class ZyraNavbar extends HTMLElement {
   constructor() {
     super();
@@ -64,8 +73,7 @@ class ZyraNavbar extends HTMLElement {
         cursor: pointer;
       }
       /* badge: use pseudo after — content controlled via js later if needed, but keep 0 for now */
-      #mobile-left #cart::after {
-        content: "0";
+      #mobile-left #cart #counter {
         border-radius: 50%;
         background: #2d2a29;
         color: white;
@@ -428,6 +436,11 @@ class ZyraNavbar extends HTMLElement {
         #search input {
           width: 220px;
         }
+        #cart:hover, :focus-visible {
+        	background: #b3adad;
+        	padding: 5px;
+        	border-radius: 5px;
+        }
       }
 
       /* make sure logo fits */
@@ -466,6 +479,9 @@ class ZyraNavbar extends HTMLElement {
             width="30"
             height="30"
           />
+            <div id="counter">
+              0
+            </div>
         </div>
 
         <button id="search-button" aria-label="Search">
@@ -564,28 +580,7 @@ class ZyraNavbar extends HTMLElement {
         <span>Shopping Cart</span>
         <button class="close-btn" id="close-cart">&times;</button>
       </div>
-      <div id="cart-items-list">
-        <div class="cart-item">
-          <img
-            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='100' viewBox='0 0 80 100'%3E%3Crect width='80' height='100' fill='%23eaeaea'/%3E%3Ctext x='10' y='55' fill='%23999' font-size='12'%3EAmber%3C/text%3E%3C/svg%3E"
-            alt="Amber Culottes"
-          />
-          <div class="item-details">
-            <h4>AMBER CULOTTES - SIZE 12</h4>
-            <p class="item-price">1 x ₦31,500.00</p>
-          </div>
-        </div>
-        <div class="cart-item">
-          <img
-            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='100' viewBox='0 0 80 100'%3E%3Crect width='80' height='100' fill='%23eaeaea'/%3E%3Ctext x='10' y='55' fill='%23999' font-size='12'%3EBlouse%3C/text%3E%3C/svg%3E"
-            alt="Silk blouse"
-          />
-          <div class="item-details">
-            <h4>SILK BLOUSE - SIZE 8</h4>
-            <p class="item-price">1 x ₦22,800.00</p>
-          </div>
-        </div>
-      </div>
+      <div id="cart-items-list"></div>
       <div class="cart-actions">
         <button class="btn-dark">View Cart</button>
         <button class="btn-dark">Checkout</button>
@@ -622,17 +617,24 @@ class ZyraNavbar extends HTMLElement {
     // Scope everything to 'this' (the custom element instance)
     const qs = (selector) => this.querySelector(selector);
 
+    /**
+     * @type {Record<string,HTMLElement>}
+     */
     const elements = {
       hamburger: qs("#hamburger-button"),
       leftNav: qs("#left-nav"),
       navOverlay: qs("#nav-overlay"),
       searchBtn: qs("#search-button"),
       searchOverlay: qs("#desktop-search"),
-      cartBtn: qs("#mobile-left #cart"),
+      cartMobileBtn: qs("#mobile-left #cart"),
+      cartDesktopBtn: qs("#left-side > div:nth-child(3) > div:nth-child(2)"),
       cartSidebar: qs("#cart-sidebar-1"),
       cartOverlay: qs("#cart-nav-overlay"),
       closeCart: qs("#close-cart"),
       cancelSearch: qs("#cancle-button"),
+      cartList: qs("#cart-items-list"),
+      counter: qs("#counter"),
+      desktopCounter: qs("#cart-count"),
     };
 
     // Helper to toggle
@@ -640,6 +642,42 @@ class ZyraNavbar extends HTMLElement {
       el?.classList.toggle("open", force);
       overlay?.classList.toggle("open", force);
     };
+
+    /**
+     * @type {productObj[]}
+     */
+    const cartProduct = getCart();
+    elements.counter.innerText = cartProduct.length;
+    elements.desktopCounter.innerText = `Cart: ${cartProduct.length}`;
+    let htmlText = elements.cartList.innerHTML;
+    cartProduct.forEach((product) => {
+      htmlText += `
+        <div class="cart-item">
+          <img
+            src="${product.image}"
+            alt="${product.name}"
+          />
+          <div class="item-details">
+            <h4>${product.name}</h4>
+            <p class="item-price">${product.quantity} x ${(() => {
+              switch (product.currency) {
+                case "NGN":
+                  return "₦";
+                case "USD":
+                  return "$";
+                case "GBP":
+                  return "£";
+                case "EUR":
+                  return "€";
+                default:
+                  return "₦";
+              }
+            })()}${product.price}</p>
+          </div>
+        </div>
+`;
+    });
+    elements.cartList.innerHTML = htmlText;
 
     // Listeners
     elements.hamburger?.addEventListener("click", () =>
@@ -656,7 +694,10 @@ class ZyraNavbar extends HTMLElement {
       toggle(elements.searchOverlay, null, false),
     );
 
-    elements.cartBtn?.addEventListener("click", () =>
+    elements.cartDesktopBtn?.addEventListener("click", () =>
+      toggle(elements.cartSidebar, elements.cartOverlay, true),
+    );
+    elements.cartMobileBtn?.addEventListener("click", () =>
       toggle(elements.cartSidebar, elements.cartOverlay, true),
     );
     elements.cartOverlay?.addEventListener("click", () =>
