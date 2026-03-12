@@ -576,11 +576,11 @@ class ZyraNavbar extends HTMLElement {
       <!-- desktop / tablet left group (hidden on mobile) -->
       <div id="left-side">
         <ul>
-          <li><a href="./index.html?param=door">Home</a></li>
-          <li class="selected"><a href="#">Product Showcase</a></li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Inquires</a></li>
-          <li><a href="#">Upcoming Events</a></li> 
+          <li class=""><a href="/">Home</a></li>
+          <li class=""><a href="/html/products.html">Products</a></li>
+          <li class=""><a href="/html/events.html">Events</a></li> 
+          <li class=""><a href="/html/about.html">About</a></li>
+          <li class=""><a href="/html/inquires.html">Inquires</a></li>
         </ul>
 
         <div id="search">
@@ -625,7 +625,7 @@ class ZyraNavbar extends HTMLElement {
         style="margin-bottom: 8px"
       />
       <ul>
-        <li><a href="#">Home</a></li>
+        <li class=""><a href="/">Home</a></li>
         <li>
           <input
             type="checkbox"
@@ -633,18 +633,20 @@ class ZyraNavbar extends HTMLElement {
             class="dropdown-checkbox"
           />
           <label for="category-toggle" class="dropdown-label">
-            <span class="icon"></span> <span>Categories</span>
+            <span class="icon"></span> <span>Product Showcase</span>
           </label>
           <ul class="submenu" style="padding: 0px; margin: 0px">
-            <li><a href="products.html#tops">Tops</a></li>
-            <li><a href="products.html#dresses">Dresses</a></li>
-            <li><a href="products.html#shirts">Shirts</a></li>
-            <li><a href="products.html#trousers">Trousers</a></li>
-            <li><a href="products.html#skirts">Skirts</a></li>
+            <li><a href="/html/products.html">All</a></li>
+            <li><a href="/html/products.html?filter=tops">Tops</a></li>
+            <li><a href="/html/products.html?filter=dresses">Dresses</a></li>
+            <li><a href="/html/products.html?filter=shirts">Shirts</a></li>
+            <li><a href="/html/products.html?filter=trousers">Trousers</a></li>
+            <li><a href="/html/products.html?filter=skirts">Skirts</a></li>
           </ul>
         </li>
-        <li><a href="#">About</a></li>
-        <li class="selected"><a href="#">Contact Us</a></li>
+        <li class=""><a href="/html/about.html">About Us</a></li>
+        <li class=""><a href="/html/inquires.html">Inquires</a></li>
+        <li class=""><a href="/html/events.html">Upcoming Events</a></li>
       </ul>
     </div>
     <div id="nav-overlay"></div>

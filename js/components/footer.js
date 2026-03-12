@@ -112,11 +112,9 @@ class ZyraFooter extends HTMLElement {
           <div class="footer-section">
             <h4>Info</h4>
             <ul class="info-links">
-              <li><a href="#">Ready To Wear</a></li>
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Size Guide</a></li>
-              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="/html/products.html">Ready To Wear</a></li>
+              <li><a href="/html/about.html">About Us</a></li>
+              <li><a href="/html/privacy.html">Privacy Policy</a></li>
             </ul>
           </div>
         </div>
