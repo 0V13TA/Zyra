@@ -82,6 +82,7 @@ function addToCart(product) {
 
     const stringProduct = JSON.stringify(ParsedProducts);
     localStorage.setItem("cart", stringProduct);
+    window.dispatchEvent(new Event("cartUpdated"));
   } catch (error) {
     if (error instanceof SyntaxError)
       console.log("Invalid Value In LocalStorage");

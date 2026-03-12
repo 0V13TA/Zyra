@@ -8,24 +8,7 @@
  * @property {"top" | "dress" | "shirt" | "trouser" | "skirt"} type
  */
 
-class ZyraNavbar extends HTMLElement {
-  constructor() {
-    super();
-    // We are not using Shadow DOM here so that your global CSS
-    // and fonts still apply easily, but we will scope the JS.
-  }
-
-  connectedCallback() {
-    this.render();
-    this.initLogic();
-  }
-
-  render() {
-    // Move your HTML here
-    this.innerHTML = `
-    <!-- your original styles + refinements for tablet/laptop -->
-    <style>
-      /* ----- base layout (mobile first, then tablet/laptop overrides) ----- */
+const navbarStyle = ` /* ----- base layout (mobile first, then tablet/laptop overrides) ----- */
       nav {
         display: flex;
         align-items: center;
@@ -402,14 +385,7 @@ class ZyraNavbar extends HTMLElement {
         width: 150px;
         outline: none;
       }
-      #currency-selector {
-        background: transparent;
-        border: 1px solid #ccc;
-        border-radius: 20px;
-        padding: 6px 8px;
-        font-size: 0.8rem;
-      }
-
+      
       /* ----- tablet / laptop media query (refined breakpoints) ----- */
       @media screen and (min-width: 768px) {
         /* hide mobile group, show desktop group */
@@ -432,7 +408,7 @@ class ZyraNavbar extends HTMLElement {
       /* for large laptop, we can keep left-side more spacious */
       @media screen and (min-width: 1024px) {
         #left-side {
-          gap: 40px;
+          gap: 100px;
         }
         #search input {
           width: 220px;
@@ -453,13 +429,115 @@ class ZyraNavbar extends HTMLElement {
       /* extra: active links simulation */
       #left-side ul li:first-child a {
        color: #888;
-      }
+      }`;
+
+class ZyraNavbar extends HTMLElement {
+  constructor() {
+    super();
+  }
+
+  connectedCallback() {
+    this.render();
+    this.updateCartUI();
+    this.initLogic();
+
+    // Inside your ZyraNavbar class initLogic:
+    this.querySelectorAll(".submenu a").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const category = new URL(link.href).hash.replace("#", ""); // e.g., 'tops'
+
+        // Navigate to products page with the category as a search param
+        const targetUrl = new URL(
+          "/html/products.html",
+          window.location.origin,
+        );
+        targetUrl.searchParams.set("category", category);
+
+        window.location.href = targetUrl.toString();
+      });
+    });
+
+    // 1. Listen for changes from OTHER tabs
+    window.addEventListener("storage", (e) => {
+      if (e.key === "cart") this.updateCartUI();
+    });
+
+    // 2. Listen for changes in the CURRENT tab (Custom Event)
+    window.addEventListener("cartUpdated", () => {
+      this.updateCartUI();
+    });
+  }
+
+  updateCartUI() {
+    const cartData = JSON.parse(localStorage.getItem("cart")) || [];
+    const count = cartData.reduce((acc, item) => acc + item.quantity, 0);
+
+    // Update the badge and the text count
+    const badge = this.querySelector("#mobile-left #cart");
+    const textCount = this.querySelector("#cart-count");
+
+    if (badge) badge.setAttribute("data-count", count);
+    if (textCount) textCount.textContent = `Cart: ${count}`;
+
+    // Optional: Update the actual list inside the sidebar if it's open
+    this.renderCartItems(cartData);
+  }
+
+  renderCartItems() {
+    /**
+     * @type {productObj[]}
+     */
+    const cartList = this.querySelector("#cart-items-list");
+    const counter = this.querySelector("#counter");
+    const desktopCounter = this.querySelector("#cart-count");
+
+    const cartProduct = getCart();
+    counter.innerText = cartProduct.length;
+    desktopCounter.innerText = `Cart: ${cartProduct.length}`;
+    let htmlText = "";
+    cartProduct.forEach((product) => {
+      htmlText += `
+        <div class="cart-item">
+          <img
+            src="${product.image}"
+            alt="${product.name}"
+          />
+          <div class="item-details">
+            <h4>${product.name}</h4>
+            <p class="item-price">${product.quantity} x ${(() => {
+              switch (product.currency) {
+                case "NGN":
+                  return "₦";
+                case "USD":
+                  return "$";
+                case "GBP":
+                  return "£";
+                case "EUR":
+                  return "€";
+                default:
+                  return "₦";
+              }
+            })()}${product.price}</p>
+          </div>
+        </div>
+        `;
+    });
+    cartList.innerHTML = htmlText;
+  }
+
+  render() {
+    // Move your HTML here
+    this.innerHTML = `
+    <!-- your original styles + refinements for tablet/laptop -->
+    <style>
+    ${navbarStyle}
     </style>
   </head>
   <body>
     <nav id="mobile">
       <!-- main logo -->
-      <img src="../static/Zyra-logo.svg" alt="Logo" width="75" height="75" />
+      <img src="/static/Zyra-logo.svg" alt="Logo" width="75" height="75" />
 
       <!-- mobile action group -->
       <div id="mobile-left">
@@ -499,9 +577,10 @@ class ZyraNavbar extends HTMLElement {
       <div id="left-side">
         <ul>
           <li><a href="./index.html?param=door">Home</a></li>
-          <li class="selected"><a href="#">Categories</a></li>
+          <li class="selected"><a href="#">Product Showcase</a></li>
           <li><a href="#">About</a></li>
-          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Inquires</a></li>
+          <li><a href="#">Upcoming Events</a></li> 
         </ul>
 
         <div id="search">
@@ -517,12 +596,7 @@ class ZyraNavbar extends HTMLElement {
         </div>
 
         <div style="display: flex; align-items: center; gap: 18px">
-          <select name="currency" id="currency-selector">
-            <option value="NGN" selected>₦ NGN</option>
-            <option value="USD">$ USD</option>
-            <option value="EUR">€ EUR</option>
-            <option value="GBP">£ GBP</option>
-          </select>
+          <currency-selector></currency-selector>
           <div
             id="cart"
             role="button"
@@ -644,45 +718,6 @@ class ZyraNavbar extends HTMLElement {
       overlay?.classList.toggle("open", force);
     };
 
-    const updateCart = () => {
-      /**
-       * @type {productObj[]}
-       */
-      const cartProduct = getCart();
-      elements.counter.innerText = cartProduct.length;
-      elements.desktopCounter.innerText = `Cart: ${cartProduct.length}`;
-      let htmlText = "";
-      cartProduct.forEach((product) => {
-        htmlText += `
-        <div class="cart-item">
-          <img
-            src="${product.image}"
-            alt="${product.name}"
-          />
-          <div class="item-details">
-            <h4>${product.name}</h4>
-            <p class="item-price">${product.quantity} x ${(() => {
-              switch (product.currency) {
-                case "NGN":
-                  return "₦";
-                case "USD":
-                  return "$";
-                case "GBP":
-                  return "£";
-                case "EUR":
-                  return "€";
-                default:
-                  return "₦";
-              }
-            })()}${product.price}</p>
-          </div>
-        </div>
-        `;
-      });
-      elements.cartList.innerHTML = htmlText;
-    };
-    updateCart();
-
     // Listeners
     elements.hamburger?.addEventListener("click", () =>
       toggle(elements.leftNav, elements.navOverlay, true),
@@ -699,11 +734,11 @@ class ZyraNavbar extends HTMLElement {
     );
 
     elements.cartDesktopBtn?.addEventListener("click", () => {
-      updateCart();
+      this.renderCartItems();
       toggle(elements.cartSidebar, elements.cartOverlay, true);
     });
     elements.cartMobileBtn?.addEventListener("click", () => {
-      updateCart();
+      this.renderCartItems();
       toggle(elements.cartSidebar, elements.cartOverlay, true);
     });
     elements.cartOverlay?.addEventListener("click", () =>
@@ -722,9 +757,7 @@ class ZyraNavbar extends HTMLElement {
       }
     });
 
-    window.addEventListener("storage", () => {
-      updateCart();
-    });
+    window.addEventListener("storage", () => updateCart());
   }
 }
 
