@@ -67,8 +67,9 @@ function addToCart(product) {
   try {
     const localProducts = localStorage.getItem("cart");
     if (localProducts === null) {
-      const stringProduct = JSON.stringify(product);
+      const stringProduct = JSON.stringify([product]);
       localStorage.setItem("cart", stringProduct);
+      window.dispatchEvent(new Event("cartUpdated"));
       return;
     }
 

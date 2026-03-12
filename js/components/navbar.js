@@ -442,21 +442,6 @@ class ZyraNavbar extends HTMLElement {
     this.initLogic();
 
     // Inside your ZyraNavbar class initLogic:
-    this.querySelectorAll(".submenu a").forEach((link) => {
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        const category = new URL(link.href).hash.replace("#", ""); // e.g., 'tops'
-
-        // Navigate to products page with the category as a search param
-        const targetUrl = new URL(
-          "/html/products.html",
-          window.location.origin,
-        );
-        targetUrl.searchParams.set("category", category);
-
-        window.location.href = targetUrl.toString();
-      });
-    });
 
     // 1. Listen for changes from OTHER tabs
     window.addEventListener("storage", (e) => {
@@ -759,7 +744,7 @@ class ZyraNavbar extends HTMLElement {
       }
     });
 
-    window.addEventListener("storage", () => updateCart());
+    window.addEventListener("storage", () => this.renderCartItems());
   }
 }
 
