@@ -1,6 +1,10 @@
+import "./currency-selector.js";
+import { getCart } from "../utils/cart.js";
+
 /**
  * @typedef {Object} productObj
  * @property {string} name
+ * @property {string} slug
  * @property {number} price
  * @property {string} image
  * @property {number} quantity

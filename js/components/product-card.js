@@ -122,7 +122,7 @@ class ZyraProductCard extends HTMLElement {
               default:
                 return "₦";
             }
-          })()}${price}</span>
+          })()}${Number(price).toLocaleString()}</span>
         </div>
       </div>
     `;
@@ -135,12 +135,13 @@ class ZyraProductCard extends HTMLElement {
         new CustomEvent("add-to-cart", {
           bubbles: true,
           detail: {
-            quantity: 1,
+            quantity: Number(this.getAttribute("quantity")) || 1,
             image: this.getAttribute("img") || "",
             type: this.getAttribute("type") || "skirt",
-            name: this.getAttribute("name") || "product no name",
             price: Number(this.getAttribute("price")) || 0,
             currency: this.getAttribute("currency") || "NGN",
+            slug: this.getAttribute("slug") || "product-no-name",
+            name: this.getAttribute("name") || "product no name",
           },
         }),
       );

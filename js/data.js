@@ -1,6 +1,9 @@
+import { slugify } from "./utils/slugify.js";
+
 /**
  * @typedef {Object} productObj
  * @property {string} name
+ * @property {string} slug
  * @property {number} price
  * @property {string} image
  * @property {number} quantity
@@ -20,4 +23,9 @@ const Products = [
     quantity: 1,
     type: "top",
   },
-];
+].map((product) => ({
+  ...product,
+  slug: product.slug || slugify(product.name),
+}));
+
+export default Products;

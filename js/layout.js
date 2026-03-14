@@ -1,6 +1,16 @@
 /**
+ * layout.js - Centralized entry point for shared components
+ */
+import "./components/navbar.js";
+import "./components/footer.js";
+import "./components/product-card.js";
+import "./components/product-detail.js";
+import { addToCart } from "./utils/cart.js";
+
+/**
  * @typedef {Object} productObj
  * @property {string} name
+ * @property {string} slug
  * @property {number} price
  * @property {string} image
  * @property {number} quantity

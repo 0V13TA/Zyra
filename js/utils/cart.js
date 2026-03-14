@@ -1,6 +1,7 @@
 /**
  * @typedef {Object} productObj
  * @property {string} name
+ * @property {string} slug
  * @property {number} price
  * @property {string} image
  * @property {number} quantity
@@ -63,7 +64,7 @@ function decrementProductQuantity(productArr, name) {
  * addToCart({name:"Trousers",price:1000,currency:"naira",image:"/logo";quantity:30})
  * ```
  */
-function addToCart(product) {
+export function addToCart(product) {
   try {
     const localProducts = localStorage.getItem("cart");
     if (localProducts === null) {
@@ -135,7 +136,7 @@ function addToCart(product) {
  *
  * ```
  */
-function getCart() {
+export function getCart() {
   try {
     const localProducts = localStorage.getItem("cart");
     if (localProducts === null) {
@@ -158,7 +159,7 @@ function getCart() {
  *
  * @param {string} name - Name of the product
  */
-function reduceProductQty(name) {
+export function reduceProductQty(name) {
   try {
     const localProducts = localStorage.getItem("cart");
     if (localProducts === null) return;
@@ -192,7 +193,7 @@ function reduceProductQty(name) {
  *
  * @param {string} name - Name of the product
  */
-function deleteProduct(name) {
+export function deleteProduct(name) {
   try {
     const localProducts = localStorage.getItem("cart");
     if (localProducts === null) return;

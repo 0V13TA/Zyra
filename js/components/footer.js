@@ -1,3 +1,5 @@
+import "./currency-selector.js";
+
 const footerStyles = `
   footer {
     background-color: #f4f4f4;
