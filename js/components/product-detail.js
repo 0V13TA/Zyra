@@ -1,7 +1,8 @@
+import { getProductBySlug } from "../utils/products.js";
+
 const detailStyles = `
   :host {
     display: block;
-    padding: 40px 5%;
     font-family: system-ui, sans-serif;
     color: #2d2a29;
   }
@@ -9,6 +10,7 @@ const detailStyles = `
     display: grid;
     grid-template-columns: 1fr;
     gap: 40px;
+    padding: 40px 5%;
   }
   @media (min-width: 992px) {
     .product-container {
@@ -21,6 +23,7 @@ const detailStyles = `
     display: flex;
     justify-content: center;
     align-items: center;
+    outline: 1px solid grey;
   }
   .image-viewer img {
     max-width: 100%;
@@ -117,25 +120,26 @@ const detailStyles = `
 
 class ZyraProductDetail extends HTMLElement {
   connectedCallback() {
-    this.render();
+    const product = getProductBySlug();
+    if (product) {
+      this.render(product);
+      this.setupInteraction();
+    } else {
+      this.innerHTML = `<h1>Product Not Found</h1>`;
+    }
   }
 
-  render() {
-    // Data mapping from your productObj schema
-    const name = this.getAttribute("name") || "Product Name";
-    const price = this.getAttribute("price") || "0.00";
-    const currency = this.getAttribute("currency") || "NGN";
-    const img = this.getAttribute("image") || "";
-
-    // Symbols for currency
-    const symbols = { NGN: "₦", USD: "$", GBP: "£", EUR: "€" };
-    const symbol = symbols[currency] || "₦";
-
+  /**
+   * @param {import("../data.js").productObj} data -
+   */
+  render(data) {
+    const { name, price, currency, image } = data;
+    const symbol = { NGN: "₦", USD: "$", GBP: "£", EUR: "€" }[currency] || "₦";
     this.innerHTML = `
       <style>${detailStyles}</style>
       <div class="product-container">
         <div class="image-viewer">
-          <img src="${img}" alt="${name}" />
+          <img src="${image}" alt="${name}" />
         </div>
         
         <div class="details-pane">

@@ -146,6 +146,14 @@ class ZyraProductCard extends HTMLElement {
         }),
       );
     });
+
+    this.addEventListener("click", (e) => {
+      // Only navigate if they didn't click the "Add to Cart" button
+      if (!e.target.closest(".action-btn")) {
+        const slug = this.getAttribute("slug");
+        window.location.href = `/html/productDetail.html?id=${slug}`;
+      }
+    });
   }
 }
 customElements.define("zyra-product-card", ZyraProductCard);
