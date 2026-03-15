@@ -128,6 +128,10 @@ class ZyraProductDetail extends HTMLElement {
     } else {
       this.innerHTML = `<h1>Product Not Found</h1>`;
     }
+
+    window.addEventListener("currency-changed", () => {
+      if (product) this.updateVisualPrice(product);
+    });
   }
 
   /**
