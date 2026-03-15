@@ -1,4 +1,5 @@
 import { getProductBySlug } from "../utils/products.js";
+import { formatPrice } from "../utils/currency.js";
 
 const detailStyles = `
   :host {
@@ -123,10 +124,21 @@ class ZyraProductDetail extends HTMLElement {
     const product = getProductBySlug();
     if (product) {
       this.render(product);
-      this.setupInteraction();
+      this.updateVisualPrice(product);
     } else {
       this.innerHTML = `<h1>Product Not Found</h1>`;
     }
+  }
+
+  /**
+   * @param {import("./navbar.js").productObj} productData
+   **/
+  async updateVisualPrice(productData) {
+    const targetCurrency = localStorage.getItem("currency") || "NGN";
+    const formatted = await formatPrice(productData.price, targetCurrency);
+
+    const priceEl = this.querySelector(".price");
+    if (priceEl) priceEl.textContent = formatted;
   }
 
   /**

@@ -1,3 +1,5 @@
+import { formatPrice } from "../utils/currency.js";
+
 const cardStyles = `
   :host {
     display: block;
@@ -85,6 +87,20 @@ class ZyraProductCard extends HTMLElement {
   connectedCallback() {
     this.render();
     this.setupListeners();
+    this.updateVisualPrice();
+
+    window.addEventListener("currency-changed", () => {
+      this.updateVisualPrice();
+    });
+  }
+
+  async updateVisualPrice() {
+    const priceNGN = Number(this.getAttribute("price"));
+    const targetCurrency = localStorage.getItem("currency") || "NGN";
+
+    const formatted = await formatPrice(priceNGN, targetCurrency);
+    const priceElement = this.querySelector(".product-price");
+    if (priceElement) priceElement.textContent = formatted;
   }
 
   render() {

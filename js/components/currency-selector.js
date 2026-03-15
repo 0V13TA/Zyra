@@ -39,24 +39,20 @@ class CurrencySelector extends HTMLElement {
       }
     }
 
+    // Inside js/components/currency-selector.js
     currencySelector.addEventListener("change", (e) => {
-      /**
-       * @type {HTMLSelectElement}
-       */
-      const target = e.currentTarget;
-      /**
-       * @type {HTMLOptionElement}
-       */
-      const selectedOption = target.selectedOptions[0];
-      localStorage.setItem("currency", selectedOption.value);
-      dispatchEvent(
-        new CustomEvent("optionChange", {
-          detail: selectedOption.value,
+      const selectedValue = e.target.value;
+      localStorage.setItem("currency", selectedValue);
+
+      // Notify the whole window that prices need to change
+      window.dispatchEvent(
+        new CustomEvent("currency-changed", {
+          detail: { currency: selectedValue },
         }),
       );
     });
 
-    addEventListener("optionChange", (e) => {
+    addEventListener("currency-changed", (e) => {
       const options = currencySelector.options;
       for (let i = 0; i < options.length; i++) {
         const element = options[i];

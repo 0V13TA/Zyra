@@ -1,5 +1,6 @@
 import "./currency-selector.js";
 import { getCart } from "../utils/cart.js";
+import { formatPrice } from "../utils/currency.js";
 
 /**
  * @typedef {Object} productObj
@@ -484,8 +485,13 @@ class ZyraNavbar extends HTMLElement {
     const cartProduct = getCart();
     counter.innerText = cartProduct.length;
     desktopCounter.innerText = `Cart: ${cartProduct.length}`;
+
     let htmlText = "";
-    cartProduct.forEach((product) => {
+    cartProduct.forEach(async (product) => {
+      // Inside renderCartItems() in js/components/navbar.js
+      const targetCurrency = localStorage.getItem("currency") || "NGN";
+      const formattedPrice = await formatPrice(product.price, targetCurrency);
+
       htmlText += `
         <div class="cart-item">
           <img
@@ -494,20 +500,7 @@ class ZyraNavbar extends HTMLElement {
           />
           <div class="item-details">
             <h4>${product.name}</h4>
-            <p class="item-price">${product.quantity} x ${(() => {
-              switch (product.currency) {
-                case "NGN":
-                  return "₦";
-                case "USD":
-                  return "$";
-                case "GBP":
-                  return "£";
-                case "EUR":
-                  return "€";
-                default:
-                  return "₦";
-              }
-            })()}${product.price}</p>
+            <p class="item-price">${product.quantity} x ${formattedPrice}</p>
           </div>
         </div>
         `;
